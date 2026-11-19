@@ -1,0 +1,27 @@
+model1_dir: "/storage/models/models/Qwen/Qwen3-8B"
+model2_dir: "/test/models/Light-IF-8B/"
+datasets1: "math:/workspaces/AMARIS/calibration_data/Math-think.jsonl"
+dataset2: "if:/workspaces/AMARIS/calibration_data/IF-no-think.jsonl"
+train_proportion: 0.8
+max_seq_len: 1024
+max_num_tokens: 100000000
+alpha: 0.01 # projection preservation budget
+beta: 0.5 # base coefficient for non-projected parameters
+layers_to_ignore: "" # excluded from covariances, deltas, bases, and AMARIS projection
+enable_delta_variant: false # experimental delta-aware basis ranking
+basis_gpus: all # use every visible GPU for basis construction
+output_dir: "outputs-specialist-qwen-v6/output-Qwen3-8B-IF-math-hybrid"
+
+# Covariance memory/quality controls. All linear layers are collected;
+# layers_to_ignore excludes those layers from all AMARIS artifacts and beta-mixes them.
+num_chunks: 1 # integer >= 1; more chunks reduce covariance GPU memory but require more passes
+cov_dtype: float32 # choices: float32 (faster/lower memory), float64 (higher precision)
+cov_num_samples: 10000 # positive integer; fewer samples speed covariance collection
+tokenizer_streaming: false # choices: false (eager load), true (stream large source datasets)
+truncate_packed_documents: false # true drops tokens beyond max_seq_len per document during packing
+max_k: 512 # positive integer; LOBPCG candidate/selected-rank cap; lower is faster
+basis_solver: lobpcg # choices: lobpcg (fast approximate), dense (exact but O(d^3))
+lobpcg_tolerance: 1e-3 # positive float; larger tolerance converges faster with less precision
+lobpcg_max_iterations: 50 # positive integer; lower cap is faster but may under-converge
+lobpcg_max_retries: 5 # positive integer; retry numerical LOBPCG failures before beta fallback
+lobpcg_max_ridge_scale: 1e-2 # positive float; cap eta at 1% of mean C1 variance
