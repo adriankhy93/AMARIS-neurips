@@ -2,7 +2,27 @@
 
 [NeurIPS 2026 poster page](https://neurips.cc/virtual/2026/loc/paris/poster/154547)
 
+**Preventing catastrophic forgetting and recovering lost capabilities** are key goals when combining generalist and specialist LLMs. AMARIS is a training-free model merging method that aims to recover generalist capabilities degraded by specialist fine-tuning while retaining specialist performance. Recovery and retention depend on the checkpoints, calibration data, and merge settings.
+
 AMARIS transfers specialist updates along selected activation subspaces while controlling a regularized base-output perturbation budget. It uses calibration statistics without additional training and produces a single static Hugging Face checkpoint, with no inference-time adapters or routing. The [`merge.sh`](merge.sh) script runs the merge pipeline and saves one checkpoint per invocation.
+
+![AMARIS overview: collect calibration statistics from the generalist and specialist, select a subspace under the alpha budget, apply the projected weight update, and save a static checkpoint.](assets/overview.png)
+
+*Layerwise merge pipeline from the poster. Each model supplies activation statistics from its calibration set; the selected subspace determines which specialist updates are inherited.*
+
+## Results
+
+![Operating points for finance, instruction following, and SEA, comparing core and specialist retention for AMARIS, other merge baselines, and the source checkpoints.](assets/operating_points.png)
+
+*Results plot from the poster. Moving right means greater core retention; moving up means greater specialist retention. Core scores are normalized to the generalist checkpoint and specialist scores to the specialist checkpoint. Diamonds mark AMARIS, circles mark other merge baselines, and squares mark the source checkpoints. These are selected operating points.*
+
+Core Avg. covers AIME26, LCB_v6, IFEval, and GPQA:Diamond. Specialist benchmarks are FPB (finance), IFBench (instruction following), and SEAHELM (SEA).
+
+<p align="center">
+  <img src="assets/results_table.png" width="650" alt="Results table from the poster, showing core and specialist scores for the source checkpoints, merge baselines, and AMARIS across finance, instruction following, and multilingual SEA.">
+</p>
+
+*Results table rendered directly from the poster, preserving its layout and highlighting. Values are raw scores (higher is better); bold scores identify the best merge method shown in each setting, excluding the source checkpoints.*
 
 The configurations and commands below are general usage examples. They are not complete recipes for reproducing the paper's results.
 
